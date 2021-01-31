@@ -1,0 +1,37 @@
+This project attempts to build the Linux distro for a custom ZCU102 v1.1 design using
+Yocto 'gatesgarth' release and meta-xilinx 'gatesgarth' layers.
+
+The custom design is minimal: the PS with a PL blinking a LED.
+
+The ZCU102 design (https://github.com/likewise/zcu102-blinky) contains:
+- the default ZynqMP MPSoC Processing System (PS) with all FPGA AXI buses disabled.
+- a very small Programmable Logic (PL) bitstream that blinks PL LED0 near the Zynq logo
+  (Note that LED DS47 is already blinking by default - do not be confused).
+
+The PMU firmware and the PMU configuration are currently taken from the Xilinx v2020.2 BSP
+pre-built release:
+
+        tar -O -xvf ~/Downloads/xilinx-zcu102-v2020.2-final.bsp xilinx-zcu102-2020.2/pre-built/linux/images/pmufw.elf >build/tmp/deploy/images/zcu102-zynqmp/pmu-zcu102-zynqmp.elf
+        tar -O -xvf ~/Downloads/xilinx-zcu102-v2020.2-final.bsp xilinx-zcu102-2020.2/pre-built/linux/images/pmu_rom_qemu_sha3.elf >build/tmp/deploy/images/zcu102-zynqmp/pmu-rom.elf
+        tar -O -xvf ~/Downloads/xilinx-zcu102-v2020.2-final.bsp xilinx-zcu102-2020.2/pre-built/linux/images/system.dtb >build/tmp/deploy/images/zcu102-zynqmp/system.dtb
+
+Future work is to build the PMU from Yocto (using multiconfig for example).
+
+Future work is to add IP to the PL that requires the device tree for PL to be generated.
+
+Currently manually using TFTP/NFS to boot the board beyond U-Boot:
+
+if dhcp 0x1000000 192.168.2.5:/tftproot/zcu102/download.bit; then fpga loadb 0 0x1000000 1; fi;
+tftpboot 0x100000 192.168.2.5:/tftproot/zcu102/zynqmp-zcu102-rev1.1.dtb; tftpboot 0x200000 192.168.2.5:/tftproot/zcu102/Image
+setenv bootargs 'ip=dhcp root=/dev/nfs nfsroot=192.168.2.5:/nfsroot/zcu102,nfsvers=3,tcp  earlycon console=ttyPS0,115200 clk_ignore_unused'
+booti 0x200000 - 0x100000
+
+Current state:
+
+- U-Boot requires manual configuration overrides in order to build correctly.
+  (see meta-project U-Boot .bbappend).
+- Boot sequence is Boot ROM->SPL-(EL3)->U-Boot
+- Linux kernel crashes.
+
+runqemu boots but uses the non-SPL flow.
+
