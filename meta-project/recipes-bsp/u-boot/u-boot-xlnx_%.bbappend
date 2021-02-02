@@ -1,6 +1,3 @@
-LIC_FILES_CHKSUM = "file://Licenses/README;md5=5a7450c57ffe5ae63fd732446b988025"
-SRCREV = "184aa6504143b452132e28cd3ebecc7b941cdfa1"
-
 # configure the PMU firmware binary and the PMU configuration object
 # currently still assuming it is externally provided for and deployed
 do_configure_append() {
