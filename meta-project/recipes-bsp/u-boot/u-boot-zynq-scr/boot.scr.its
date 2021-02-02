@@ -1,0 +1,17 @@
+/dts-v1/;
+ 
+/ {
+    description = "Boot script";
+    images {
+         default = "script";
+         script {
+             description = "Boot script";
+             data = /incbin/("./boot.cmd");
+             type = "script";
+             compression = "none";
+             hash {
+                 algo = "sha1";
+             };
+        };
+    };
+};
