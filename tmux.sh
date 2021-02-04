@@ -17,10 +17,11 @@ tmux start-server
 
 #tmux kill-session -t ${SESSIONNAME}
 
-mkdir -p ${DIR}/${BUILDDIR}
+mkdir -p ${DIR}/${BUILDDIR}/${BUILDTMP}
+(cd ${DIR}/${BUILDDIR} && sudo -n mount -t tmpfs tmpfs ./tmp || echo "Not mounting tmpfs on build/tmp")
+
 mkdir -p ${DIR}/${BUILDDIR}/${BUILDTMP}/work
-mkdir -p ${DIR}/${BUILDDIR}/${BUILDTMP}/deploy
-mkdir -p ${DIR}/${BUILDDIR}/${BUILDTMP}/deploy/images
+mkdir -p ${DIR}/${BUILDDIR}/${BUILDTMP}/deploy/images/zcu102-zynqmp
 
 tmux has-session -t ${SESSIONNAME}
 if [ $? -gt 0 ]; then
@@ -37,7 +38,7 @@ if [ $? -gt 0 ]; then
   tmux send-keys -t ${SESSIONNAME}:build ". ./poky/oe-init-build-env ${BUILDDIR}/" C-m
   tmux new-window -d -k -t ${SESSIONNAME}:2 -n work -c ${DIR}/${BUILDDIR}/${BUILDTMP}/work
   tmux new-window -d -k -t ${SESSIONNAME}:3 -n deploy -c ${DIR}/${BUILDDIR}/${BUILDTMP}/deploy
-  tmux new-window -d -k -t ${SESSIONNAME}:4 -n images -c ${DIR}/${BUILDDIR}/${BUILDTMP}/deploy/images
+  tmux new-window -d -k -t ${SESSIONNAME}:4 -n images -c ${DIR}/${BUILDDIR}/${BUILDTMP}/deploy/images/zcu102-zynqmp
 
   # SMARC remote syslog
   tmux new-window -d -k -t ${SESSIONNAME}:5 -n syslog -c ${DIR}
